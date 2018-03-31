@@ -114,6 +114,7 @@ var stockSchema = new mongoose.Schema(
   Stock.find({}, function(err, data) {
   if (err) {
   resp.json({ message: 'Unable to connect to stock' });
+
   } else {
 
       // return json retrived by Mongo as response
@@ -124,6 +125,27 @@ var stockSchema = new mongoose.Schema(
   //end function
   }//closing get
 );//closing get
+
+
+
+
+app.get('/api/stocks/:symbol', function (req,resp)
+{
+  // use mongoose to retrieve all books from Mongo
+Stock.find({Symbol:req.params.symbol}, function(err, data) {
+if (err) {
+resp.json({ message: 'Unable to connect to stock' });
+
+} else {
+
+    // return json retrived by Mongo as response
+    resp.json(data);
+    console.log(data)
+  }//end of else
+}); //end of retive
+//end function
+}//closing get
+);//cl
 
   app.listen(app.get('port'), function() {
     console.log('Node app is running on port', app.get('port'));
