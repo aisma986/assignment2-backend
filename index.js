@@ -1,3 +1,4 @@
+
 var cool = require('cool-ascii-faces');
 var express = require('express');
 var app = express();
@@ -49,7 +50,7 @@ express()
 //---------------------------------------------------------------------
 
 */
-mongoose.connect('mongodb://admin:admin@ds127899.mlab.com:27899/heroku_540jxx2m');
+mongoose.connect('mongodb://admin:admin@ds231229.mlab.com:31229/heroku_9150nsl9');
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function callback () {
@@ -84,6 +85,8 @@ secondary: String
 
 // "compile the schema into a model"
 var Book = mongoose.model('book',bookSchema);
+app.use(parser.json());
+app.use(parser.urlencoded({extended: true}));
 
 app.get('/api/book', function (req,resp)
 {
@@ -305,3 +308,12 @@ else{
   }
 );
 */
+//------------------------------testing runTime
+
+app.get('/times', function(request, response) {
+    var result = ''
+    var times = process.env.TIMES || 5
+    for (i=0; i < times; i++)
+      result += i + ' ';
+  response.send(result);
+});
