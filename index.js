@@ -56,6 +56,60 @@ db.once('open', function callback () {
 console.log("connected to mongo");
 });
 
+
+//-------------------------bookSchema
+
+var bookSchema = new mongoose.Schema(
+
+{
+
+id: Number,
+isbn10: String,
+isbn13: String,
+title: String,
+year: Number,
+publisher: String,
+production: {
+status: String,
+binding: String,
+size: String,
+pages: Number,
+instock: Date
+},
+category: {
+main: String,
+secondary: String
+}
+});
+
+// "compile the schema into a model"
+var Book = mongoose.model('book',bookSchema);
+
+app.get('/api/book', function (req,resp)
+{
+  // use mongoose to retrieve all books from Mongo
+Book.find({}, function(err, data) {
+if (err) {
+resp.json({ message: 'Unable to connect to stock' });
+
+} else {
+
+    // return json retrived by Mongo as response
+    resp.json(data);
+    console.log(data)
+  }//end of else
+}); //end of retive
+//end function
+}//closing get
+);//closing get
+
+
+
+
+
+
+//----------------------------------Stocks
+
 var stockSchema = new mongoose.Schema(
 
   {
