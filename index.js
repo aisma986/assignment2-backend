@@ -408,3 +408,43 @@ var companiesSchema = new mongoose.Schema(
   //end function
   }//closing get
 );//closing get
+
+
+// schema and code for the portfolio table //////////////////
+
+var portfolioSchema = new mongoose.Schema(
+    {
+       id:Number,
+    symbol:String,
+    user:Number,
+    owned:Number
+
+    }
+    
+    
+    );
+    
+    
+   var Portfolio = mongoose.model('Portfolio',portfolioSchema); 
+    
+    app.use(parser.json());
+  app.use(parser.urlencoded({extended: true}));
+  
+  
+   app.get('/api/portfolio', function (req,resp)
+  {
+    // use mongoose to retrieve all books from Mongo
+  Portfolio.find({}, function(err, data) {
+  if (err) {
+  resp.json({ message: 'Unable to connect to companies' });
+
+  } else {
+
+      // return json retrived by Mongo as response
+      resp.json(data);
+      console.log(data)
+    }//end of else
+  }); //end of retive
+  //end function
+  }//closing get
+);//closing get
