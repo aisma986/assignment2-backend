@@ -370,10 +370,15 @@ var pricesSchema = new mongoose.Schema(
 
 var companiesSchema = new mongoose.Schema(
     {
-        id:Number,
-    symbol:String,
-    user:Number,
-    owned:Number
+        symbol:String,
+    name:String,
+    sector:String,
+    subindustry:String,
+    address:String,
+    date_added:Date,
+    CIK:Number,
+    frequency:Number
+
     }
     
     
