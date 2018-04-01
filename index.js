@@ -50,11 +50,19 @@ express()
 //---------------------------------------------------------------------
 
 */
+<<<<<<< HEAD
 mongoose.connect('mongodb://admin:admin@ds127899.mlab.com:27899/heroku_540jxx2m');
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function callback () {
 console.log("connected to mongo now!!");
+=======
+mongoose.connect('mongodb://admin:admin@ds231229.mlab.com:31229/heroku_9150nsl9');
+var db = mongoose.connection;
+db.on('error', console.error.bind(console, 'connection error:'));
+db.once('open', function callback () {
+console.log("connected to mongo");
+>>>>>>> 718703c62f7fda57800c5029809513441a2a0e5f
 });
 
 
@@ -294,6 +302,16 @@ else{
 }
 });
 });
+<<<<<<< HEAD
+=======
+
+
+
+
+
+
+
+>>>>>>> 718703c62f7fda57800c5029809513441a2a0e5f
   //wiring code using express to listen to port
   let port = 2222;
   app.listen(port, function()
