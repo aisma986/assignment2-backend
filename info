@@ -1,0 +1,6 @@
+git add .
+git commint -m "comment"
+git push origin master
+
+
+to connect to db to run queries use 

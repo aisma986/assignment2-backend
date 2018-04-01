@@ -320,3 +320,46 @@ app.get('/times', function(request, response) {
       result += i + ' ';
   response.send(result);
 });
+
+
+
+//the code for the prices table
+
+var pricesSchema = new mongoose.Schema(
+    {
+        date:Date,
+        open:Number,
+        high:Number,
+        low:Number,
+    close:Number,
+    volume: Number,
+    name:String
+    }
+    
+    
+    );
+    
+    
+   var Prices = mongoose.model('Price',pricesSchema); 
+    
+    app.use(parser.json());
+  app.use(parser.urlencoded({extended: true}));
+  
+  
+   app.get('/api/prices', function (req,resp)
+  {
+    // use mongoose to retrieve all books from Mongo
+  Prices.find({}, function(err, data) {
+  if (err) {
+  resp.json({ message: 'Unable to connect to prices' });
+
+  } else {
+
+      // return json retrived by Mongo as response
+      resp.json(data);
+      console.log(data)
+    }//end of else
+  }); //end of retive
+  //end function
+  }//closing get
+);//closing get
