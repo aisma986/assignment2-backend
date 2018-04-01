@@ -323,7 +323,7 @@ app.get('/times', function(request, response) {
 
 
 
-//the code for the prices table
+//the code for the prices table/////////////////////////////////////////////////////////////////////////
 
 var pricesSchema = new mongoose.Schema(
     {
@@ -352,6 +352,46 @@ var pricesSchema = new mongoose.Schema(
   Prices.find({}, function(err, data) {
   if (err) {
   resp.json({ message: 'Unable to connect to prices' });
+
+  } else {
+
+      // return json retrived by Mongo as response
+      resp.json(data);
+      console.log(data)
+    }//end of else
+  }); //end of retive
+  //end function
+  }//closing get
+);//closing get
+
+
+
+// schema and code for the companies table //////////////////
+
+var companiesSchema = new mongoose.Schema(
+    {
+        id:Number,
+    symbol:String,
+    user:Number,
+    owned:Number
+    }
+    
+    
+    );
+    
+    
+   var Companies = mongoose.model('Company',companiesSchema); 
+    
+    app.use(parser.json());
+  app.use(parser.urlencoded({extended: true}));
+  
+  
+   app.get('/api/companies', function (req,resp)
+  {
+    // use mongoose to retrieve all books from Mongo
+  Companies.find({}, function(err, data) {
+  if (err) {
+  resp.json({ message: 'Unable to connect to companies' });
 
   } else {
 
