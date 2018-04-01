@@ -50,11 +50,11 @@ express()
 //---------------------------------------------------------------------
 
 */
-mongoose.connect('mongodb://admin:admin@ds231229.mlab.com:31229/heroku_9150nsl9');
+mongoose.connect('mongodb://admin:admin@ds127899.mlab.com:27899/heroku_540jxx2m');
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function callback () {
-console.log("connected to mongo");
+console.log("connected to mongo now!!");
 });
 
 
