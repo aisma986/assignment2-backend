@@ -1,5 +1,6 @@
 var express = require('express');
 var app = express();
+var md5 = require('crypto-md5');
 
 app.set('port', (process.env.PORT || 5000));
 
@@ -72,9 +73,7 @@ app.get('/api/prices/:month/:name',function (req,resp)
 app.get('/api/price/latest/:name',function (req,resp)
   {
      
-
-   
-  Prices.find({name:req.params.name}).sort({date: -1}).limit(1).exec( function(err, data) {
+Prices.find({name:req.params.name}).sort({date: -1}).limit(1).exec( function(err, data) {
   if (err) {
   resp.json({ message: 'Unable to connect to prices' });
 
@@ -330,7 +329,10 @@ var portfolioSchema = new mongoose.Schema(
 );//closing get
 
 //Yassin: I finished G
-app.get('/api/portfolio/:user', function (req,resp)
+//Given a user id, return all the portfolio information for that user. 
+//A given company can appear multiple times in a user’s 
+//portfolio (perhaps representing separate individual purchases).
+app.get('/api/portfolioInfo/:user', function (req,resp)
   {
     // use mongoose to retrieve all books from Mongo
   Portfolio.find({user:req.params.user}).sort({symbol:1}).exec( function(err, data) {
@@ -352,6 +354,65 @@ app.listen(app.get('port'), function() {
   console.log('Node app is running on port', app.get('port'));
 });
 
+/////////////////////////////////////////////////////////////////////////////
+
+//schema for user table
+var userSchema = new mongoose.Schema(
+    {
+        id:Number,
+       first_name:String,
+    last_name:String,
+    email:String,
+    salt:String,
+    password:String
+
+    }
+
+
+    );
+
+
+   var User = mongoose.model('User',userSchema);
+
+    app.use(parser.json());
+  app.use(parser.urlencoded({extended: true}));
+
+
+   app.post('/api/user/login', function (req,resp)
+  {
+    // use mongoose to retrieve all books from Mongo
+  User.find({email:req.body.userEmail}, function(err, data) {
+  if (err) {
+  resp.send({ message: 'Unable to connect to companies' });
+
+  } else {
+
+if (data.length ===1){
+        var attemptedPass = req.body.password + data[0].salt;
+        var attemptedPassMd5= md5(attemptedPass,'hex'); 
+        if(attemptedPassMd5 == data[0].password){
+            let info = { id:data[0].id,
+       first_name:data[0].first_name,
+    last_name:data[0].last_name};
+            resp.send({ info});
+        }
+        else {
+            resp.send({ message: 'wrong password' });
+        }
+}
+      else {
+          
+          resp.send({ message: 'wrong email' });
+      }
+        //md5('foobar', 'hex');
+      // return json retrived by Mongo as response
+      //resp.json(attemptedPass);
+      //console.log(data)
+    }//end of else
+  }); //end of retive
+  //end function
+  }//closing get
+);//closing get
 
 // group chat :
 

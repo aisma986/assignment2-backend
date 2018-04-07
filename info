@@ -4,3 +4,6 @@ git push origin master
 
 
 to connect to db to run queries use 
+
+
+{"info":{"id":3,"first_name":"Sinclair","last_name":"Mc Curlye"}}
