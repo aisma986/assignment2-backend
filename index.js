@@ -310,6 +310,41 @@ var portfolioSchema = new mongoose.Schema(
   app.use(parser.urlencoded({extended: true}));
 
 
+
+// Yassin: I finished H 
+
+app.get('/api/portfolioPercentage/:user', function (req,resp)
+  {
+      var x = parseInt(req.params.user);
+      
+    // use mongoose to retrieve all books from Mongo
+  Portfolio.aggregate([{   $match: {user: x} }, { $group: { _id:"$symbol",total:{$sum: "$owned"}} }]).exec( function(err, data) {
+  if (err) {
+  resp.json({ message: 'Unable to connect to portfolios' });
+
+  } else {
+
+    var totalStocks =0; 
+        for (let x in data){
+            totalStocks += data[x].total;
+        }
+        var y =0;
+    for (let x in data){
+        
+        data[x].total = (data[x].total/totalStocks);
+         y +=data[x].total ;
+    }
+      resp.json(data);
+     console.log(y);
+    }//end of else
+  }); //end of retive
+  //end function
+  }//closing get
+);
+
+
+
+
    app.get('/api/portfolio', function (req,resp)
   {
     // use mongoose to retrieve all books from Mongo
@@ -321,7 +356,7 @@ var portfolioSchema = new mongoose.Schema(
 
       // return json retrived by Mongo as response
       resp.json(data);
-      console.log(data)
+      console.log(data);
     }//end of else
   }); //end of retive
   //end function
@@ -340,10 +375,11 @@ app.get('/api/portfolioInfo/:user', function (req,resp)
   resp.json({ message: 'Unable to connect to portfolios' });
 
   } else {
-
+        
+        
       // return json retrived by Mongo as response
       resp.json(data);
-      console.log(data)
+      console.log(data);
     }//end of else
   }); //end of retive
   //end function
