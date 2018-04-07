@@ -1,5 +1,3 @@
-
-var cool = require('cool-ascii-faces');
 var express = require('express');
 var app = express();
 
@@ -15,41 +13,9 @@ app.get('/', function(request, response) {
   response.render('pages/index')
 });
 
-app.get('/cool', function(request, response) {
-  response.send(cool());
-});
-
-
-
-
-
-
-
-
-
-
 var mongoose = require('mongoose');
 var parser = require('body-parser');
-//
-/*
-const express = require('express')
-const path = require('path')
-const PORT = process.env.PORT || 5000
 
-express()
-  .use(express.static(path.join(__dirname, 'public')))
-  .set('views', path.join(__dirname, 'views'))
-  .set('view engine', 'ejs')
-
-  .get('/', (req, res) => res.render('pages/index'))
-
-
-
-
-  .listen(PORT, () => console.log(`Listening on ${ PORT }`))
-//---------------------------------------------------------------------
-
-*/
 mongoose.connect('mongodb://admin:admin@ds231229.mlab.com:31229/heroku_9150nsl9');
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
@@ -58,272 +24,7 @@ console.log("connected to mongo");
 });
 
 
-//-------------------------bookSchema
-
-var bookSchema = new mongoose.Schema(
-
-{
-
-id: Number,
-isbn10: String,
-isbn13: String,
-title: String,
-year: Number,
-publisher: String,
-production: {
-status: String,
-binding: String,
-size: String,
-pages: Number,
-instock: Date
-},
-category: {
-main: String,
-secondary: String
-}
-});
-
-// "compile the schema into a model"
-var Book = mongoose.model('book',bookSchema);
-app.use(parser.json());
-app.use(parser.urlencoded({extended: true}));
-
-app.get('/api/book', function (req,resp)
-{
-  // use mongoose to retrieve all books from Mongo
-Book.find({}, function(err, data) {
-if (err) {
-resp.json({ message: 'Unable to connect to stock' });
-
-} else {
-
-    // return json retrived by Mongo as response
-    resp.json(data);
-    console.log(data)
-  }//end of else
-}); //end of retive
-//end function
-}//closing get
-);//closing get
-
-
-
-
-
-
-//----------------------------------Stocks
-
-var stockSchema = new mongoose.Schema(
-
-  {
-    Symbol:String,
-    Company_Name:String,
-    SEC_filings:String,
-    Sector:String,
-    Sub_Industry:String,
-    Address_of_Headquarters:String,
-    Date_first_added:String,
-    CIK:Number,
-    Financials:
-    {
-      Id:Number,
-      Symbol:String,
-      Period_Ending:String,
-      Accounts_Payable:Number,
-      Accounts_Receivable:Number,
-      Addl_incomeexpense_items:Number
-     },
-    Prices:{
-    Id: Number,
-    Date: String,
-    Open: Number,
-    High: Number,
-    Low: Number,
-    Close: Number,
-    Volume: String,
-    Name: String
-  }
-  });
-
-
-
-
-  // "compile the schema into a model"
-  var Stock = mongoose.model('Stock',stockSchema);
-
-
-
-  //Add on the necessary “wiring” for express as follows:
-  // create an express app
-  //var app = express();
-  // tell node to use json and HTTP header features in body-parser
-  app.use(parser.json());
-  app.use(parser.urlencoded({extended: true}));
-
-  // handle GET requests for [domain]/api/books e.g. return all books
-//app.get('/cool', function(request, response) {
-//  response.send(cool());
-//});
-
-  app.get('/api/stocks', function (req,resp)
-  {
-    // use mongoose to retrieve all books from Mongo
-  Stock.find({}, function(err, data) {
-  if (err) {
-  resp.json({ message: 'Unable to connect to stock' });
-
-  } else {
-
-      // return json retrived by Mongo as response
-      resp.json(data);
-      console.log(data)
-    }//end of else
-  }); //end of retive
-  //end function
-  }//closing get
-);//closing get
-
-
-
-
-app.get('/api/stocks/:symbol', function (req,resp)
-{
-  // use mongoose to retrieve all books from Mongo
-Stock.find({Symbol:req.params.symbol}, function(err, data) {
-if (err) {
-resp.json({ message: 'Unable to connect to stock' });
-
-} else {
-
-    // return json retrived by Mongo as response
-    resp.json(data);
-    console.log(data)
-  }//end of else
-}); //end of retive
-//end function
-}//closing get
-);//cl
-
-  app.listen(app.get('port'), function() {
-    console.log('Node app is running on port', app.get('port'));
-  });
-
-
-/*
-  app.route('/api/stocks/:symbol')
-  .get(function(req, resp)
-  {
-    Stock.find({Symbol:req.params.symbol}, function(err,data)
-
-    {
-  if(err)
-  {
-    resp.json({message: 'Stock not found'});
-    console.log("not found ");
-  }
-  else{
-
-    resp.json(data);
-    console.log("It is working");
-  }
-});
-  });
-
-//https://your-domain-here/api/stocks/sector/Industrials
-//Returns just the Symbol and Company_Name fields for
-//each stock with a matching Sector
-/*
-
-app.route('/api/stocks/sector/:sector')
-.get(function(req, resp)
-{
-  Stock.find({Sector:req.params.sector}, {Company_Name:1, Symbol:1,  _id:0},
-    //{Id:0,Company_Name:1,Symbol:1})
-  //.select ('Company_Name Symbol')
-   function(err,data)
-
-  {
-if(err)
-{
-  resp.json({message: 'Stock not found'});
-  console.log("not found ");
-}
-else{
-
-  resp.json(data);
-  //resp.json({Id:0});
-  console.log("It is working");
-}
-});
-});
-
-
-/*https://your-domain-here/api/stocks/prices/2015-11-16/AMZN
-Returns just the Price objects for specified symbol for the
-specified date. Because the price data is an array element,
-it is a bit tricky to return just a single sub-element from a s
-ub-array. You will need to construct your query using the Mongoose find()
-method similar to the following:
-.find( { 'Prices.Name': req.params.symb,
-'Prices.Date': new RegExp(req.params.date)},
-{'Prices.$': 1 },
-function(err, data) { ... });
-The emphasized text tells MongoDB to return just the specified sub-element.*/
-
-/*
-app.route('/api/stocks/prices/:date/:symb')
-.get(function(req, resp)
-{
-  Stock.find({'Prices.Name':req.params.symb,
-          'Prices.Date': new RegExp(req.params.date)},
-    {'Prices.$':1, '_id':0},
-
-    function(err,data)
-    //.select('Price[]')
-
-  {
-if(err)
-{
-  resp.json({message: 'Stock not found'});
-  console.log("not found ");
-}
-else{
-
-  resp.json(data);
-  console.log("It is working");
-}
-});
-});
-<<<<<<< HEAD
-=======
-
-
-
-
-
-
-
->>>>>>> 718703c62f7fda57800c5029809513441a2a0e5f
-  //wiring code using express to listen to port
-  let port = 2222;
-  app.listen(port, function()
-  {console.log("server is running at port= " + port);
-  }
-);
-*/
-//------------------------------testing runTime
-
-app.get('/times', function(request, response) {
-    var result = ''
-    var times = process.env.TIMES || 5
-    for (i=0; i < times; i++)
-      result += i + ' ';
-  response.send(result);
-});
-
-
-
-//the code for the prices table/////////////////////////////////////////////////////////////////////////
+// schema for price database
 
 var pricesSchema = new mongoose.Schema(
     {
@@ -334,18 +35,80 @@ var pricesSchema = new mongoose.Schema(
     close:Number,
     volume: Number,
     name:String
+
     }
-    
-    
+
+
     );
-    
-    
-   var Prices = mongoose.model('Price',pricesSchema); 
-    
+
+
+   var Prices = mongoose.model('Price',pricesSchema);
+
     app.use(parser.json());
   app.use(parser.urlencoded({extended: true}));
+
+// Yassin: I finshed C
+app.get('/api/prices/:month/:name',function (req,resp)
+  {
+     var start = new Date(2017, req.params.month-1, 1);
+     var end = new Date(2017, req.params.month-1, 31);
+   
+  Prices.find({name:req.params.name, date:{$gte: start, $lt: end} }, function(err, data) {
+  if (err) {
+  resp.json({ message: 'Unable to connect to prices' });
+
+  } else {
+        
+      // return json retrived by Mongo as response
+      resp.json(data);
+      console.log(data);
+    }//end of else
+  }); //end of retive
+  //end function
+  }//closing get
+);//closing get
+
+//Yassin : I finished F
+app.get('/api/price/latest/:name',function (req,resp)
+  {
+     
+
+   
+  Prices.find({name:req.params.name}).sort({date: -1}).limit(1).exec( function(err, data) {
+  if (err) {
+  resp.json({ message: 'Unable to connect to prices' });
+
+  } else {
+        
+      // return json retrived by Mongo as response
+      resp.json(data);
+      console.log(data);
+    }//end of else
+  })});
   
   
+  
+//Yassin : I finished E
+app.get('/api/price/:date/:name',function (req,resp)
+  {
+     var start = new Date(req.params.date);
+
+   
+  Prices.find({name:req.params.name, date:{$eq: start} }, function(err, data) {
+  if (err) {
+  resp.json({ message: 'Unable to connect to prices' +start});
+
+  } else {
+        
+      // return json retrived by Mongo as response
+      resp.json(data);
+      console.log(data);
+    }//end of else
+  }); //end of retive
+  //end function
+  }//closing get
+);//closing get
+
    app.get('/api/prices', function (req,resp)
   {
     // use mongoose to retrieve all books from Mongo
@@ -364,13 +127,88 @@ var pricesSchema = new mongoose.Schema(
   }//closing get
 );//closing get
 
+//C. Given a stock symbol and a month,
+//return the price information for each day in the specified month
+
+//Still not working on it!!!!
+/*
+app.get('/api/prices/:date/:name', function (req,resp)
+{
+ // use mongoose to retrieve all books from Mongo
+Prices.find({name : req.params.name,
+date: new RegExp(req.params.date)},
+{$:1})
+
+.exec(function(err, data)
+{
+if(err){
+resp.json({ message: 'Unable to connect to prices' });
+    }
+else {
+   // return json retrived by Mongo as response
+   resp.json(data);
+   console.log("price and month wor")
+ }
+});//end of else
+
+});//closing get
+
+*/
+//Yassin: I finished D 
+
+app.get('/api/average/prices/:name',function (req,resp)
+  {
+     
+   //aggregate({$match: {name: "AMZN"}}, {$group: {_id:"$name", avg:{$sum:1}}})
+  Prices.aggregate([{   '$match' : { name:req.params.name } },{$group : {_id : {month: {$month:"$date"}}, close : {$avg : "$close"}}}, 
+  {$sort: {_id: 1}}], function(err, data) {
+  if (err) {
+  resp.json({ message: 'Unable to connect to prices' ,err});
+
+  } else {
+        
+      // return json retrived by Mongo as response
+      resp.json(data);
+      console.log(data);
+    }//end of else
+  }); //end of retive
+  //end function
+  }//closing get
+);//closing get
+
+
+
+/*Given a stock symbol and a month, return the price information for each day in
+//the specified month. Some days (weekends and holidays)
+//have no data, so this service will likely return some 15-20 price objects.
+
+app.get('/api/prices/:symb', function (req,resp)
+{
+ // use mongoose to retrieve all books from Mongo
+Prices.find({name: req.params.symb}, function(err, data) {
+if (err) {
+resp.json({ message: 'Unable to connect to prices' });
+
+} else {
+
+   // return json retrived by Mongo as response
+   resp.json(data);
+   console.log(data)
+ }//end of else
+}); //end of retive
+//end function
+}//closing get
+);//closing get
+
+yassin was here
+*/
 
 
 // schema and code for the companies table //////////////////
 
 var companiesSchema = new mongoose.Schema(
     {
-        symbol:String,
+    symbol:String,
     name:String,
     sector:String,
     subindustry:String,
@@ -380,17 +218,17 @@ var companiesSchema = new mongoose.Schema(
     frequency:Number
 
     }
-    
-    
+
+
     );
-    
-    
-   var Companies = mongoose.model('Company',companiesSchema); 
-    
-    app.use(parser.json());
+
+
+   var Companies = mongoose.model('Company',companiesSchema);
+
+  app.use(parser.json());
   app.use(parser.urlencoded({extended: true}));
-  
-  
+
+
    app.get('/api/companies', function (req,resp)
   {
     // use mongoose to retrieve all books from Mongo
@@ -402,12 +240,54 @@ var companiesSchema = new mongoose.Schema(
 
       // return json retrived by Mongo as response
       resp.json(data);
-      console.log(data)
+      console.log("data")
     }//end of else
   }); //end of retive
   //end function
   }//closing get
 );//closing get
+
+
+
+// B) Given a stock symbol, return the company information for it.
+app.get('/api/company/:symInfo', function (req,resp)
+{
+ // use mongoose to retrieve all books from Mongo
+Companies.find({symbol: req.params.symInfo}, function(err, data) {
+if (err) {
+resp.json({ message: 'Unable to connect to company' });
+
+} else {
+
+   // return json retrived by Mongo as response
+   resp.json(data);
+   console.log(data)
+ }//end of else
+}); //end of retive
+//end function
+}//closing get
+);//closing get
+
+//Yassin: I finished i
+app.get('/api/companies/information', function (req,resp)
+  {
+    // use mongoose to retrieve all books from Mongo
+  Companies.find({},{name:1,symbol:1, _id:0}, function(err, data) {
+  if (err) {
+  resp.json({ message: 'Unable to connect to companies' });
+
+  } else {
+
+      // return json retrived by Mongo as response
+      resp.json(data);
+      console.log("data")
+    }//end of else
+  }); //end of retive
+  //end function
+  }//closing get
+);
+
+
 
 
 // schema and code for the portfolio table //////////////////
@@ -420,17 +300,17 @@ var portfolioSchema = new mongoose.Schema(
     owned:Number
 
     }
-    
-    
+
+
     );
-    
-    
-   var Portfolio = mongoose.model('Portfolio',portfolioSchema); 
-    
+
+
+   var Portfolio = mongoose.model('Portfolio',portfolioSchema);
+
     app.use(parser.json());
   app.use(parser.urlencoded({extended: true}));
-  
-  
+
+
    app.get('/api/portfolio', function (req,resp)
   {
     // use mongoose to retrieve all books from Mongo
@@ -448,3 +328,38 @@ var portfolioSchema = new mongoose.Schema(
   //end function
   }//closing get
 );//closing get
+
+//Yassin: I finished G
+app.get('/api/portfolio/:user', function (req,resp)
+  {
+    // use mongoose to retrieve all books from Mongo
+  Portfolio.find({user:req.params.user}).sort({symbol:1}).exec( function(err, data) {
+  if (err) {
+  resp.json({ message: 'Unable to connect to portfolios' });
+
+  } else {
+
+      // return json retrived by Mongo as response
+      resp.json(data);
+      console.log(data)
+    }//end of else
+  }); //end of retive
+  //end function
+  }//closing get
+);//closing get
+
+app.listen(app.get('port'), function() {
+  console.log('Node app is running on port', app.get('port'));
+});
+
+
+// group chat :
+
+// Abdullah :
+
+
+//Given a stock symbol, return the average close value for each month in the year
+//db.prices.aggregate({$match: {name: "AMZN"}}, {$group: {_id:"$name", avg:{$sum:1}}})
+
+
+
