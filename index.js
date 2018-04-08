@@ -450,12 +450,12 @@ if (data.length ===1){
             resp.send({ info});
         }
         else {
-            
+            resp.send({message:"null" });
         }
 }
       else {
           
-          
+          resp.send({ message :"null"});
       }
         //md5('foobar', 'hex');
       // return json retrived by Mongo as response
